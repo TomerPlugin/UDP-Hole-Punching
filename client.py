@@ -9,8 +9,11 @@ server = ('113.30.191.147', 55555)
 print('connecting to server')
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-sock.bind(('0.0.0.0', 50001))
-sock.sendto('Tomer PC'.encode(), server)
+# sock.bind(('0.0.0.0', 50001))
+
+user_id = input('Your User ID: ')
+
+sock.sendto('user_id'.encode(), server)
 
 while True:
     data = sock.recv(1024).decode()
@@ -20,30 +23,20 @@ while True:
         break
 
 data = sock.recv(1024).decode()
-ip, src_sport, dst_port = data.split(' ')
-src_sport = int(src_sport)
-dst_port = int(dst_port)
+ip, port = data.split(' ')
+port = int(port)
 
 print('\ngot peer')
 print('  ip:          {}'.format(ip))
-print('  source port: {}'.format(src_sport))
-print('  dest port:   {}\n'.format(dst_port))
+print('  port: {}'.format(port))
 
-# punch hole
-# equiv: echo 'punch hole' | nc -u -p src_port x.x.x.x dst_port
 print('punching hole')
 
-sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-sock.bind(('0.0.0.0', src_sport))
-sock.sendto(b'0', (ip, dst_port))
-
+sock.sendto('PC!'.encode(), (ip, port))
 print('ready to exchange messages\n')
 
 # listen for
-# equiv: nc -u -l src_port
 def listen():
-    # sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    # sock.bind(('0.0.0.0', src_sport))
 
     while True:
         data = sock.recv(1024)
@@ -52,11 +45,6 @@ def listen():
 listener = threading.Thread(target=listen, daemon=True);
 listener.start()
 
-# send messages
-# equiv: echo 'xxx' | nc -u -p dst_port x.x.x.x src_sport
-sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-sock.bind(('0.0.0.0', dst_port))
-
 while True:
     msg = input('> ')
-    sock.sendto(msg.encode(), (ip, src_sport))
+    sock.sendto(msg.encode(), (ip, port))
