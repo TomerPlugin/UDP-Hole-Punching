@@ -23,16 +23,17 @@ while True:
         break
 
 data = sock.recv(1024).decode()
-ip, port = data.split(' ')
+ip, port, peer_id= data.split(' ')
 port = int(port)
 
 print('\ngot peer')
-print('  ip:          {}'.format(ip))
+print('  id: {}'.format(peer_id))
+print('  ip: {}'.format(ip))
 print('  port: {}'.format(port))
 
 print('punching hole')
 
-sock.sendto('PC!'.encode(), (ip, port))
+sock.sendto(b'0'.encode(), (ip, port))
 print('ready to exchange messages\n')
 
 # listen for
@@ -40,7 +41,7 @@ def listen():
 
     while True:
         data = sock.recv(1024)
-        print('\rpeer: {}\n> '.format(data.decode()), end='')
+        print('\@{}: {}\n> '.format(peer_id, data.decode()), end='')
 
 listener = threading.Thread(target=listen, daemon=True);
 listener.start()
