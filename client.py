@@ -30,6 +30,7 @@ print('  source port: {}'.format(src_sport))
 print('  dest port:   {}\n'.format(dst_port))
 
 # punch hole
+# equiv: echo 'punch hole' | nc -u -p src_port x.x.x.x dst_port
 print('punching hole')
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -39,9 +40,10 @@ sock.sendto(b'0', (ip, dst_port))
 print('ready to exchange messages\n')
 
 # listen for
+# equiv: nc -u -l src_port
 def listen():
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    sock.bind(('0.0.0.0', src_sport))
+    # sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    # sock.bind(('0.0.0.0', src_sport))
 
     while True:
         data = sock.recv(1024)
@@ -51,6 +53,7 @@ listener = threading.Thread(target=listen, daemon=True);
 listener.start()
 
 # send messages
+# equiv: echo 'xxx' | nc -u -p dst_port x.x.x.x src_sport
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.bind(('0.0.0.0', dst_port))
 
