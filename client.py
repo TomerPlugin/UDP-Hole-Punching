@@ -9,11 +9,10 @@ server = ('113.30.191.147', 55555)
 print('connecting to server')
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-# sock.bind(('0.0.0.0', 50001))
 
 user_id = input('Your User ID: ')
 
-sock.sendto('user_id'.encode(), server)
+sock.sendto(user_id.encode(), server)
 
 while True:
     data = sock.recv(1024).decode()
@@ -31,9 +30,10 @@ print('  id: {}'.format(peer_id))
 print('  ip: {}'.format(ip))
 print('  port: {}'.format(port))
 
-print('punching hole')
+print('\npunching hole')
 
-sock.sendto(b'0'.encode(), (ip, port))
+sock.sendto(b'0', (ip, port))
+
 print('ready to exchange messages\n')
 
 # listen for
@@ -41,7 +41,8 @@ def listen():
 
     while True:
         data = sock.recv(1024)
-        print('\@{}: {}\n> '.format(peer_id, data.decode()), end='')
+        if (data.decode() != '0'):
+            print('@{}: {}\n> '.format(peer_id, data.decode()), end='')
 
 listener = threading.Thread(target=listen, daemon=True);
 listener.start()
